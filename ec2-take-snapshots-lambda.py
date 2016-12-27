@@ -11,11 +11,11 @@ VOLUMES = []
 
 # Dictionary of tags to use to filter the volumes. May specify multiple
 # eg. {'key': 'value'} or {'key1': 'value1', 'key2': 'value2', ...}
-VOLUME_TAGS = {}
+VOLUME_TAGS = {'Backup': 'true'}
 
 # Dictionary of tags to apply to the created snapshots.
 # eg. {'key': 'value'} or {'key1': 'value1', 'key2': 'value2', ...}
-SNAPSHOT_TAGS = {}
+SNAPSHOT_TAGS = {'CreatedBy': 'lambda'}
 
 # AWS region in which the volumes exist
 REGION = "us-east-1"
@@ -77,7 +77,7 @@ def main(event, context):
     NOOP = event['noop'] if 'noop' in event else False
     NOT_REALLY_STR = " (not really)" if NOOP is not False else ""
     ec2 = resource("ec2", region_name=REGION)
-    tags_kwargs = process_tags()
+    #tags_kwargs = process_tags()
     snap_count = 0
 
     if VOLUMES and not VOLUME_TAGS:
@@ -101,6 +101,13 @@ def main(event, context):
         tag_volumes = get_tag_volumes(ec2)
         if tag_volumes.count > 0:
             for tag_volume in tag_volumes:
+                print(ec2.Volume(tag_volume.volume_id).tags)
+                temp_tags = ec2.Volume(tag_volume.volume_id).tags
+                for i in range(0, len(temp_tags)):
+                    if temp_tags[i]['Key'] == 'Name':
+                        #print(temp_tags[i]['Value'])
+                        SNAPSHOT_TAGS['Name'] = temp_tags[i]['Value']
+                tags_kwargs = process_tags()
                 take_snapshots(tag_volume, tags_kwargs)
                 snap_count += 1
         else:
@@ -110,3 +117,7 @@ def main(event, context):
         print("You must populate either the VOLUMES OR"
               " the VOLUME_TAGS variable."
               )
+
+event={}
+context={}
+main(event,context)
