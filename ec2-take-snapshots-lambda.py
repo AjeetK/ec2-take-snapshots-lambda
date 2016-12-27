@@ -11,11 +11,11 @@ VOLUMES = []
 
 # Dictionary of tags to use to filter the volumes. May specify multiple
 # eg. {'key': 'value'} or {'key1': 'value1', 'key2': 'value2', ...}
-VOLUME_TAGS = {'Backup': 'true'}
+VOLUME_TAGS = {}
 
 # Dictionary of tags to apply to the created snapshots.
 # eg. {'key': 'value'} or {'key1': 'value1', 'key2': 'value2', ...}
-SNAPSHOT_TAGS = {'CreatedBy': 'lambda'}
+SNAPSHOT_TAGS = {}
 
 # AWS region in which the volumes exist
 REGION = "us-east-1"
@@ -117,7 +117,3 @@ def main(event, context):
         print("You must populate either the VOLUMES OR"
               " the VOLUME_TAGS variable."
               )
-
-event={}
-context={}
-main(event,context)
